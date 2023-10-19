@@ -1,0 +1,32 @@
+{
+  "devDependencies": {
+    "wbn": "^0.0.9",
+    "wbn-sign": "^0.1.2",
+    "webbundle-webpack-plugin": "^0.1.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  },
+  "name": "iwa-windowing-example",
+  "version": "1.0.0",
+  "main": "webpack.config.js",
+  "author": "msw@chromium.org",
+  "license": "Apache-2.0",
+  "description": "## Windowing",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelwasserman/iwa-windowing-example.git"
+  },
+  "keywords": [
+    "IWA"
+  ],
+  "bugs": {
+    "url": "https://github.com/michaelwasserman/iwa-windowing-example/issues"
+  },
+  "homepage": "https://github.com/michaelwasserman/iwa-windowing-example#readme"
+}

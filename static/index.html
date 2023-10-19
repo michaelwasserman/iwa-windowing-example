@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>IWA Windowing Example</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./index.js" defer></script>
+  <!--To keep the manifest as it is instead of making it part of any bundles–->
+  <!-- webpackIgnore: true -->
+  <link rel="manifest" href="manifest.webmanifest">
+</head>
+<body>
+  <h1>IWA Windowing Example (<a href="https://github.com/michaelwasserman/iwa-windowing-example/tree/iwa-windowing-example">GitHub</a>)</h1>
+  <h4 id="warning" hidden=true style="color: red;"></h4>
+  <div><strong>display-mode:</strong>
+    <div class="displaymode-fullscreen">fullscreen</div>
+    <div class="displaymode-standalone">standalone</div>
+    <div class="displaymode-minimal-ui">minimal-ui</div>
+    <div class="displaymode-browser">browser</div>
+    <div class="displaymode-window-controls-overlay">window-controls-overlay</div>
+    <div class="displaymode-borderless">borderless</div>
+   </div>
+  <div><strong>`window-management` permission:</strong>
+    <div id="windowManagementStatusPrompt"><button id="requestWindowManagementPermission">prompt</button></div>
+    <div id="windowManagementStatusGranted">granted</div>
+    <div id="windowManagementStatusDenied" style="color: red;">denied (reset and reload for full demo functionality)</div>  
+  </div>
+  <div><strong>HTML Fullscreen:</strong>
+    <div class="htmlfullscreen-none">(not fullscreen) <button id="requestFullscreenButton">request</button></div>
+    <div class="htmlfullscreen-fullscreen">(fullscreen)  <button id="exitFullscreenButton">exit</button></div>
+  </div>
+  <div><strong>window.open (<a href="https://chromestatus.com/feature/6002307972464640">fullscreen</a>):</strong>
+    <button id="openWindowButton">open window</button>
+    <button id="openFullscreenButton">open fullscreen</button>
+    <button id="openMultipleButton">open multiple</button>
+    <button id="openMultipleFullscreenButton">open multiple fullscreen</button>
+  </div>
+  <div><strong>app-region:</strong>
+    <div class="appregion-draggable">draggable, drag the window from here!</div>
+    <div class="appregion-other">N/A (requires window-controls-overlay with titlebar collapsed, or borderless)<div>
+  </div>
+</body>
+</html>

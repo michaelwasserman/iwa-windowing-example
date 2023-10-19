@@ -1,0 +1,48 @@
+html { background-color:whitesmoke;}
+
+.displaymode-fullscreen { display: none; }
+.displaymode-standalone { display: none; }
+.displaymode-minimal-ui { display: none; }
+.displaymode-browser { display: none; }
+.displaymode-window-controls-overlay { display: none; }
+.displaymode-borderless { display: none; }
+
+/* React on display mode changes. */ 
+@media (display-mode: fullscreen) { 
+  .displaymode-fullscreen { display: inline; }
+}
+@media (display-mode: standalone) { 
+  .displaymode-standalone { display: inline; }
+}
+@media (display-mode: minimal-ui) { 
+  .displaymode-minimal-ui { display: inline; }
+}
+@media (display-mode: browser) { 
+  .displaymode-browser { display: inline; }
+}
+@media (display-mode: window-controls-overlay) { 
+  .displaymode-window-controls-overlay { display: inline; }
+}
+@media (display-mode: borderless) { 
+    .displaymode-borderless { display: inline; }
+}
+
+.htmlfullscreen-none { display: inline; }
+.htmlfullscreen-fullscreen { display: none; }
+:fullscreen {
+  .htmlfullscreen-none { display: none; }
+  .htmlfullscreen-fullscreen { display: inline; }
+}
+
+.appregion-draggable {
+  -webkit-app-region: drag;
+  app-region: drag;
+  display: none;
+}
+.appregion-other {
+  display: inline;
+}
+@media (display-mode: window-controls-overlay) {
+  .appregion-draggable { display: inline; }
+  .appregion-other { display: none; }
+}

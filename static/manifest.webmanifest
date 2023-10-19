@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "scope": "/",
+  "start_url": "/",
+  "name": "IWA Windowing Example",
+  "version": "1.0.0",
+  "display": "standalone",
+  "permissions_policy": {
+    "cross-origin-isolated": ["self"]
+  },
+  "isolated_storage": true,
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
