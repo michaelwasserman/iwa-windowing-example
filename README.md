@@ -17,6 +17,8 @@ $ npm init
 $ npm run build
 ```
 
+This creates `dist/signed.swbn`.
+
 ## Run
 
 ```console
