@@ -8,7 +8,8 @@
   "display_override": ["borderless", "window-controls-overlay"],
   "permissions_policy": {
     "cross-origin-isolated": ["self"],
-    "window-management": ["self"]
+    "window-management": ["self"],
+    "fullscreen": ["self"]
   },
   "isolated_storage": true,
   "icons": [
