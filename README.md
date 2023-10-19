@@ -4,14 +4,12 @@ A barebones example for windowing in an [Isolated Web Application](https://githu
 
 Based on https://github.com/michaelwasserman/iwa-bundling-example 
 
-The included `ed25519key.pem` is insecure (per inclusion in this repro); see instructions to replace below.
-TODO: Resolve issues regenerating the key via `$ openssl genpkey -algorithm Ed25519 -out ed25519key.pem`  
-
 ## Prep and Bundle
 
 ```console
 $ git clone https://github.com/michaelwasserman/iwa-windowing-example.git
 $ cd iwa-windowing-example
+$ openssl genpkey -algorithm Ed25519 -out ed25519key.pem
 $ npm i
 $ npm init
 $ npm run build
@@ -19,13 +17,17 @@ $ npm run build
 
 This creates `dist/signed.swbn`.
 
+Note: Keep the new `ed25519key.pem` private key file secure; do not share it in a public repo :)
+
 ## Run
 
 ```console
-$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode
+$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode,FullscreenPopupWindows,WebAppBorderless
 ```
 
 chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> dist/signed.swbn
+
+Note: If [reinstall fails with a manifest error](crbug.com/1494141), try restarting Chrome.
 
 chrome://apps -> "IWA Windowing Example"
 

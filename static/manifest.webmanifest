@@ -5,8 +5,10 @@
   "name": "IWA Windowing Example",
   "version": "1.0.0",
   "display": "standalone",
+  "display_override": ["borderless", "window-controls-overlay"],
   "permissions_policy": {
-    "cross-origin-isolated": ["self"]
+    "cross-origin-isolated": ["self"],
+    "window-management": ["self"]
   },
   "isolated_storage": true,
   "icons": [
