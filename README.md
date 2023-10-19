@@ -10,6 +10,7 @@ The included `ed25519key.pem` is insecure (per inclusion in this repro); see ins
 
 ```console
 $ git clone https://github.com/michaelwasserman/iwa-windowing-example.git
+$ cd iwa-windowing-example
 $ openssl genpkey -algorithm Ed25519 -out ed25519key.pem
 $ npm i
 $ npm init
