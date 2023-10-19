@@ -5,23 +5,25 @@ A barebones example for windowing in an [Isolated Web Application](https://githu
 Based on https://github.com/michaelwasserman/iwa-bundling-example 
 
 The included `ed25519key.pem` is insecure (per inclusion in this repro); see instructions to replace below.
+TODO: Resolve issues regenerating the key via `$ openssl genpkey -algorithm Ed25519 -out ed25519key.pem`  
 
-## Prep and Windowing
+## Prep and Bundle
 
 ```console
 $ git clone https://github.com/michaelwasserman/iwa-windowing-example.git
 $ cd iwa-windowing-example
-$ openssl genpkey -algorithm Ed25519 -out ed25519key.pem
 $ npm i
 $ npm init
 $ npm run build
 ```
 
-## Running
+## Run
 
-`$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode`
+```console
+$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode
+```
 
-chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> iwa-windowing-example/dist/signed.swbn
+chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> dist/signed.swbn
 
 chrome://apps -> "IWA Windowing Example"
 
@@ -35,7 +37,7 @@ chrome://apps -> "IWA Windowing Example"
 
 * https://github.com/sonkkeli/borderless
 * https://github.com/GoogleChromeLabs/telnet-client
-* https://coralfish-dev-access.glitch.me/ ?
+* https://coralfish-dev-access.glitch.me/
 
 ## IWA APIs
 
