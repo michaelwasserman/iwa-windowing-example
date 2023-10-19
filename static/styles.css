@@ -27,6 +27,8 @@ html { background-color:whitesmoke;}
     .displaymode-borderless { display: inline; }
 }
 
+.warning { color: red; }
+
 .htmlfullscreen-none { display: inline; }
 .htmlfullscreen-fullscreen { display: none; }
 :fullscreen {
@@ -34,15 +36,10 @@ html { background-color:whitesmoke;}
   .htmlfullscreen-fullscreen { display: inline; }
 }
 
-.appregion-draggable {
-  -webkit-app-region: drag;
-  app-region: drag;
-  display: none;
-}
-.appregion-other {
-  display: inline;
-}
-@media (display-mode: window-controls-overlay) {
+.draggable { app-region: drag; -webkit-app-region: drag; border-style: solid; border-}
+.appregion-draggable { display: none; }
+.appregion-other { display: inline; }
+@media (display-mode: window-controls-overlay), (display-mode: borderless) {
   .appregion-draggable { display: inline; }
   .appregion-other { display: none; }
 }

@@ -12,7 +12,7 @@
 </head>
 <body>
   <h1>IWA Windowing Example (<a href="https://github.com/michaelwasserman/iwa-windowing-example/tree/iwa-windowing-example">GitHub</a>)</h1>
-  <h4 id="warning" hidden=true style="color: red;"></h4>
+  <h4 class="warning" hidden=true></h4>
   <div><strong>display-mode:</strong>
     <div class="displaymode-fullscreen">fullscreen</div>
     <div class="displaymode-standalone">standalone</div>
@@ -21,10 +21,10 @@
     <div class="displaymode-window-controls-overlay">window-controls-overlay</div>
     <div class="displaymode-borderless">borderless</div>
    </div>
-  <div><strong>`window-management` permission:</strong>
+  <div><strong><a href="https://w3c.github.io/window-management/">window-management</a> permission:</strong>
     <div id="windowManagementStatusPrompt"><button id="requestWindowManagementPermission">prompt</button></div>
     <div id="windowManagementStatusGranted">granted</div>
-    <div id="windowManagementStatusDenied" style="color: red;">denied (reset and reload for full demo functionality)</div>  
+    <div id="windowManagementStatusDenied" class="warning">denied (reset and reload for full demo functionality)</div>
   </div>
   <div><strong>HTML Fullscreen:</strong>
     <div class="htmlfullscreen-none">(not fullscreen) <button id="requestFullscreenButton">request</button></div>
@@ -36,9 +36,9 @@
     <button id="openMultipleButton">open multiple</button>
     <button id="openMultipleFullscreenButton">open multiple fullscreen</button>
   </div>
-  <div><strong>app-region:</strong>
-    <div class="appregion-draggable">draggable, drag the window from here!</div>
-    <div class="appregion-other">N/A (requires window-controls-overlay with titlebar collapsed, or borderless)<div>
+  <div><strong class="draggable">app-region: drag</strong>
+    <div class="appregion-draggable">(draggable)</div>
+    <div class="appregion-other">(not-draggable - requires display-mode: window-controls-overlay or borderless)<div>
   </div>
 </body>
 </html>
