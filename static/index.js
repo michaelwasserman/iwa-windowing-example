@@ -30,6 +30,13 @@ window.addEventListener('load', async () => {
   document.getElementById('openFullscreenButton')?.addEventListener('click', () => { openPopup({fullscreen:true}) });
   document.getElementById('openMultipleButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s}); });
   document.getElementById('openMultipleFullscreenButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:true}); });
+  // if (window.location.hash == 'fullscreen') {
+  console.log(`INFO: Load: url='${window.location.href}'`);
+  let params = new URLSearchParams(window.location.search);
+  if (params.has('fullscreen')) {
+    console.log(`Requesting fullscreen on load; currentScreen: ${screenDetails?.currentScreen.label} screen.availLeft|Top:(${screen.availLeft}, ${screen.availTop})`);
+    document.documentElement.requestFullscreen();
+  }
 });
 
 function updatePermissionStatus(p) {
@@ -85,7 +92,7 @@ async function updateScreens(requestPermission = true) {
 
 function getFeaturesFromOptions(options) {
   return "popup" +
-         (options.fullscreen ? ",fullscreen" : "") +
+        //  (options.fullscreen ? ",fullscreen" : "") + 
          (options.x ? ",left=" + options.x : "") +
          (options.y ? ",top=" + options.y : "") +
          (options.w ? ",width=" + options.w : "") +
@@ -93,7 +100,7 @@ function getFeaturesFromOptions(options) {
 }
 
 function openPopup(options = {}) {
-  if (options.url === undefined) options.url = '.';
+  if (options.url === undefined) options.url = new URL('.', window.location.href);
   if (options.screen === undefined) options.screen = window.screenDetails?.currentScreen || window.screen;
   if (options.x === undefined) options.x = options.screen.availLeft !== undefined ? options.screen.availLeft : options.screen.left;
   if (options.y === undefined) options.y = options.screen.availTop !== undefined ? options.screen.availTop : options.screen.top;
@@ -103,8 +110,17 @@ function openPopup(options = {}) {
   if (popupObserverInterval)
     clearInterval(popupObserverInterval);
   const features = getFeaturesFromOptions(options);
+  // popup = window.open(options.url + (options.fullscreen ? "?fullscreen" : ""), '_blank', features); 
+  if (options.fullscreen) {
+    // let url = new URL('.', options.url);
+    // url.search = 'fullscreen';
+    let params = new URLSearchParams(options.url.search);
+    params.set('fullscreen', '');
+    options.url.search = params.toString();
+    // options.url.search = 'fullscreen'
+  }
   popup = window.open(options.url, '_blank', features);
-  console.log('INFO: Requested popup with features: "' + features + '" result: ' + popup);
+  console.log(`INFO: Requested popup: url='${options.url.href}', features: '${features}' result: ${popup}`);
   if (popup) {
     popupObserverInterval = setInterval(() => {
       if (popup.closed) {
