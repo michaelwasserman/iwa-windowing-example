@@ -2,50 +2,51 @@
 
 let permissionStatus = null;
 let screenDetails = null;
-let popup = null;
-let popupObserverInterval = null;
-let handlingMultiScreenRequest = false;
+let popups = [];
 
-function showWarning(text) {
-  const warning = document.getElementById('warning');
-  if (warning && warning.innerHTML !== text) {
-    if (text)
-      console.error(text);
-    warning.hidden = !text;
-    warning.innerHTML = text;
-  }
+function log(text) {
+  document.getElementById('log').innerText += text + '\n';
+  console.log(text);
 }
 
 window.addEventListener('load', async () => {
   if (!('getScreenDetails' in self) || !('isExtended' in screen) || !('onchange' in screen)) {
-    showWarning("Please try a browser that supports the Window Management API");
+    log('Window Management API not supported');
   } else {
     permissionStatus = await navigator.permissions.query({name:'window-management'});
     permissionStatus.addEventListener('change', (e) => { updatePermissionStatus(e.target) });
     updatePermissionStatus(permissionStatus);
   }
   document.getElementById('requestFullscreenButton')?.addEventListener('click', () => { document.documentElement.requestFullscreen(); });
+  document.getElementById('requestFullscreenOnHoverButton')?.addEventListener('mouseenter', () => { document.documentElement.requestFullscreen(); });
   document.getElementById('exitFullscreenButton')?.addEventListener('click', () => { document.exitFullscreen(); });
   document.getElementById('openWindowButton')?.addEventListener('click', () => { openPopup() });
-  document.getElementById('openFullscreenButton')?.addEventListener('click', () => { openPopup({fullscreen:true}) });
-  document.getElementById('openMultipleButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s}); });
-  document.getElementById('openMultipleFullscreenButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:true}); });
-  // if (window.location.hash == 'fullscreen') {
-  console.log(`INFO: Load: url='${window.location.href}'`);
+  document.getElementById('openMultipleButton')?.addEventListener('click', () => { () => { for (let s of screenDetails?.screens) openPopup(); } });
+  document.getElementById('openFullscreenFeatureButton')?.addEventListener('click', () => { openPopup({fullscreen:'windowFeature'}) });
+  document.getElementById('openMultipleFullscreenFeatureButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:'windowFeature'}); });
+  document.getElementById('openFullscreenOpenerOnloadButton')?.addEventListener('click', () => { openPopup({fullscreen:'openerOnload'}) });
+  document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:'openerOnload'}); });
+  document.getElementById('openFullscreenPopupOnloadButton')?.addEventListener('click', () => { openPopup({fullscreen:'popupOnload'}) });
+  document.getElementById('openMultipleFullscreenPopupOnloadButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:'popupOnload'}); });
   let params = new URLSearchParams(window.location.search);
   if (params.has('fullscreen')) {
-    console.log(`Requesting fullscreen on load; currentScreen: ${screenDetails?.currentScreen.label} screen.availLeft|Top:(${screen.availLeft}, ${screen.availTop})`);
-    document.documentElement.requestFullscreen();
+    log(`Requesting fullscreen on load; ` +
+        // `currentScreen: ${screenDetails?.currentScreen.label} ` +
+        `screenLeft|Top:(${screenLeft}, ${screenTop}) ` +
+        `screen.availLeft|Top:(${screen.availLeft}, ${screen.availTop})`);
+    document.documentElement.requestFullscreen()
+      .then(() => { log('Fullscreen on load: success'); })
+      .catch(() => { log('Fullscreen on load: failure'); });
   }
 });
 
 function updatePermissionStatus(p) {
-  console.log(p);
   permissionStatus = p;
+  log(`Permission status: ${permissionStatus.state}`);
   document.getElementById('requestWindowManagementPermission')?.addEventListener('click', () => { window.getScreenDetails(); });
-  document.getElementById('windowManagementStatusPrompt').style.display = permissionStatus.state === 'prompt' ? "inline" : "none";
-  document.getElementById('windowManagementStatusGranted').style.display = permissionStatus.state === 'granted' ? "inline" : "none";
-  document.getElementById('windowManagementStatusDenied').style.display = permissionStatus.state === 'denied' ? "inline" : "none";
+  document.getElementById('windowManagementStatusPrompt').style.display = permissionStatus.state === 'prompt' ? 'inline' : 'none';
+  document.getElementById('windowManagementStatusGranted').style.display = permissionStatus.state === 'granted' ? 'inline' : 'none';
+  document.getElementById('windowManagementStatusDenied').style.display = permissionStatus.state === 'denied' ? 'inline' : 'none';
   updateScreens(/*requestPermission=*/false);
 }
 
@@ -67,20 +68,18 @@ async function getScreenDetailsWithWarningAndFallback(requestPermission = false)
     }
 
     if (screenDetails) {
-      // console.log("INFO: Detected " + screenDetails.screens.length + " screens:");
+      // log('Detected ' + screenDetails.screens.length + ' screens:');
       // for (let i = 0; i < screenDetails.screens.length; ++i) {
       //   const s = screenDetails.screens[i];
-      //   console.log(`[${i}] "${s.label}" ` +
-      //               `[${s.left},${s.top} ${s.width}x${s.height}] ` +
-      //               `(${s.availLeft},${s.availTop} ${s.availWidth}x${s.availHeight}) ` +
-      //               `devicePixelRatio:${s.devicePixelRatio} colorDepth:${s.colorDepth} ` +
-      //               `isExtended:${s.isExtended} isPrimary:${s.isPrimary} isInternal:${s.isInternal}`);
+      //   log(`[${i}] '${s.label}' [${s.left},${s.top} ${s.width}x${s.height}] ` +
+      //       `(${s.availLeft},${s.availTop} ${s.availWidth}x${s.availHeight}) ` +
+      //       `devicePixelRatio:${s.devicePixelRatio} colorDepth:${s.colorDepth} ` +
+      //       `isExtended:${s.isExtended} isPrimary:${s.isPrimary} isInternal:${s.isInternal}`);
       // }
       return screenDetails.screens;
     }
   }
-
-  // console.log(`INFO: Detected window.screen: (${screen.left},${screen.top} ${screen.width}x${screen.height}) isExtended:${screen.isExtended}`);
+  // log(`Detected window.screen: (${screen.left},${screen.top} ${screen.width}x${screen.height}) isExtended:${screen.isExtended}`);
   return [ window.screen ];
 }
 
@@ -91,12 +90,11 @@ async function updateScreens(requestPermission = true) {
 }
 
 function getFeaturesFromOptions(options) {
-  return "popup" +
-        //  (options.fullscreen ? ",fullscreen" : "") + 
-         (options.x ? ",left=" + options.x : "") +
-         (options.y ? ",top=" + options.y : "") +
-         (options.w ? ",width=" + options.w : "") +
-         (options.h ? ",height=" + options.h : "");
+  return 'popup' +
+         (options.x ? ',left=' + options.x : '') +
+         (options.y ? ',top=' + options.y : '') +
+         (options.w ? ',width=' + options.w : '') +
+         (options.h ? ',height=' + options.h : '');
 }
 
 function openPopup(options = {}) {
@@ -107,29 +105,41 @@ function openPopup(options = {}) {
   if (options.w === undefined) options.w = options.screen.availWidth !== undefined ? options.screen.availWidth : options.screen.width;
   if (options.h === undefined) options.h = options.screen.availHeight !== undefined ? options.screen.availHeight : options.screen.height;
 
-  if (popupObserverInterval)
-    clearInterval(popupObserverInterval);
-  const features = getFeaturesFromOptions(options);
-  // popup = window.open(options.url + (options.fullscreen ? "?fullscreen" : ""), '_blank', features); 
-  if (options.fullscreen) {
-    // let url = new URL('.', options.url);
-    // url.search = 'fullscreen';
+  let features = getFeaturesFromOptions(options);
+  if (options.fullscreen === 'windowFeature') {
+    features += ',fullscreen';
+  } else if (options.fullscreen === 'popupOnload') {
     let params = new URLSearchParams(options.url.search);
     params.set('fullscreen', '');
     options.url.search = params.toString();
-    // options.url.search = 'fullscreen'
   }
-  popup = window.open(options.url, '_blank', features);
-  console.log(`INFO: Requested popup: url='${options.url.href}', features: '${features}' result: ${popup}`);
+  let popup = window.open(options.url, '_blank', features);
+  log(`Requested popup #${popups.length + 1} with features: '${features}' ` +
+      `fullscreen?: ${options.fullscreen || 'no'} result: ${popup}`);
   if (popup) {
-    popupObserverInterval = setInterval(() => {
+    popup.number = popups.length + 1;
+    if (options.fullscreen === 'openerOnload') {
+      popup.addEventListener('load', async () => {
+        // Use a timeout so browser WebPrefs reach renderer Document Settings.
+        // Why does this event fire before the window's own load event?
+        setTimeout(async () => {
+          log(`Requesting to fullscreen popup from opener; ` +
+              // `currentScreen: ${popup.screenDetails?.currentScreen.label} ` +
+              `popup.screenLeft|Top:(${popup.screenLeft}, ${popup.screenTop}) ` +
+              `screen.availLeft|Top:(${popup.screen.availLeft}, ${popup.screen.availTop})`);
+          popup.document.documentElement.requestFullscreen()
+            .then(() => { log('Fullscreen popup from opener: success'); })
+            .catch(() => { log('Fullscreen popup from opener: failure'); });
+        }, 100);
+      });
+    }
+    popup.observerInterval = setInterval(() => {
       if (popup.closed) {
-        console.log('INFO: The latest-opened popup was closed');
-        clearInterval(popupObserverInterval);
-        popupObserverInterval = null;
-        popup = null;
+        log(`Popup #${popup.number} closed`);
+        clearInterval(popup.observerInterval);
+        popup.observerInterval = null;
       }
     }, 300);
   }
-  return popup;
+  popups.push(popup);
 }

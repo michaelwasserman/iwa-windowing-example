@@ -12,7 +12,6 @@
 </head>
 <body>
   <h1>IWA Windowing Example (<a href="https://github.com/michaelwasserman/iwa-windowing-example/tree/iwa-windowing-example">GitHub</a>)</h1>
-  <h4 class="warning" hidden=true></h4>
   <div><strong>display-mode:</strong>
     <div class="displaymode-fullscreen">fullscreen</div>
     <div class="displaymode-standalone">standalone</div>
@@ -27,18 +26,31 @@
     <div id="windowManagementStatusDenied" class="warning">denied (reset and reload for full demo functionality)</div>
   </div>
   <div><strong>HTML Fullscreen:</strong>
-    <div class="htmlfullscreen-none">(not fullscreen) <button id="requestFullscreenButton">request</button></div>
+    <div class="htmlfullscreen-none">(not fullscreen) <button id="requestFullscreenButton">request</button> <button id="requestFullscreenOnHoverButton">request on hover</button></div>
     <div class="htmlfullscreen-fullscreen">(fullscreen)  <button id="exitFullscreenButton">exit</button></div>
   </div>
-  <div><strong>window.open (<a href="https://chromestatus.com/feature/6002307972464640">fullscreen</a>):</strong>
+  <div><strong>window.open:</strong>
     <button id="openWindowButton">open window</button>
-    <button id="openFullscreenButton">open fullscreen</button>
     <button id="openMultipleButton">open multiple</button>
-    <button id="openMultipleFullscreenButton">open multiple fullscreen</button>
+  </div>
+  <div><strong>window.open (with '<a href="https://chromestatus.com/feature/6002307972464640">fullscreen</a>' windowFeature):</strong>
+    <button id="openFullscreenFeatureButton">open</button>
+    <button id="openMultipleFullscreenFeatureButton">open multiple</button>
+  </div>
+  <div><strong>window.open (opener requests fullscreen on popup load):</strong>
+    <!-- Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture. -->
+    <button id="openFullscreenOpenerOnloadButton">open</button>
+    <button id="openMultipleFullscreenOpenerOnloadButton">open multiple</button>
+  </div>
+  <div><strong>window.open (popup requests fullscreen on load itself):</strong>
+    <!-- Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture. -->
+    <button id="openFullscreenPopupOnloadButton">open</button>
+    <button id="openMultipleFullscreenPopupOnloadButton">open multiple</button>
   </div>
   <div><strong class="draggable">app-region: drag</strong>
     <div class="appregion-draggable">(draggable)</div>
     <div class="appregion-other">(not-draggable - requires display-mode: window-controls-overlay or borderless)<div>
   </div>
+  <div id="log" class="log"></div>
 </body>
 </html>
