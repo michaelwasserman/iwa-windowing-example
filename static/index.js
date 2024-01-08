@@ -10,6 +10,7 @@ function log(text) {
 }
 
 window.addEventListener('load', async () => {
+  document.documentElement.style.background = `hsl(${Math.floor(Math.random() * 360)}deg 60% 90%)`;
   if (!('getScreenDetails' in self) || !('isExtended' in screen) || !('onchange' in screen)) {
     log('Window Management API not supported');
   } else {
@@ -17,32 +18,31 @@ window.addEventListener('load', async () => {
     permissionStatus.addEventListener('change', (e) => { updatePermissionStatus(e.target) });
     updatePermissionStatus(permissionStatus);
   }
-  document.getElementById('requestFullscreenButton')?.addEventListener('click', () => { document.documentElement.requestFullscreen(); });
-  document.getElementById('requestFullscreenOnHoverButton')?.addEventListener('mouseenter', () => { document.documentElement.requestFullscreen(); });
+  document.getElementById('requestFullscreenButton')?.addEventListener('click', requestFullscreen.bind(null, 'click'));
   document.getElementById('exitFullscreenButton')?.addEventListener('click', () => { document.exitFullscreen(); });
-  document.getElementById('openWindowButton')?.addEventListener('click', () => { openPopup() });
-  document.getElementById('openMultipleButton')?.addEventListener('click', () => { () => { for (let s of screenDetails?.screens) openPopup(); } });
-  document.getElementById('openFullscreenFeatureButton')?.addEventListener('click', () => { openPopup({fullscreen:'windowFeature'}) });
-  document.getElementById('openMultipleFullscreenFeatureButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:'windowFeature'}); });
-  document.getElementById('openFullscreenOpenerOnloadButton')?.addEventListener('click', () => { openPopup({fullscreen:'openerOnload'}) });
-  document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:'openerOnload'}); });
-  document.getElementById('openFullscreenPopupOnloadButton')?.addEventListener('click', () => { openPopup({fullscreen:'popupOnload'}) });
-  document.getElementById('openMultipleFullscreenPopupOnloadButton')?.addEventListener('click', () => { for (let s of screenDetails?.screens) openPopup({screen:s, fullscreen:'popupOnload'}); });
+  document.getElementById('requestFullscreenOnMouseEnterButton')?.addEventListener('mouseenter', requestFullscreen.bind(null, 'mouseenter'));
+  document.getElementById('exitFullscreenOnMouseEnterButton')?.addEventListener('mouseenter', () => { document.exitFullscreen(); });
+  document.getElementById('openWindowButton')?.addEventListener('click', openPopup);
+  document.getElementById('openMultipleButton')?.addEventListener('click', openPopups);
+  document.getElementById('openFullscreenFeatureButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'windowFeature'}));
+  document.getElementById('openMultipleFullscreenFeatureButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'windowFeature'}));
+  document.getElementById('openFullscreenOpenerOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'openerOnload'}));
+  document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'openerOnload'}));
+  document.getElementById('openFullscreenPopupOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'popupOnload'}));
+  document.getElementById('openMultipleFullscreenPopupOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'popupOnload'}));
   let params = new URLSearchParams(window.location.search);
   if (params.has('fullscreen')) {
     log(`Requesting fullscreen on load; ` +
         // `currentScreen: ${screenDetails?.currentScreen.label} ` +
         `screenLeft|Top:(${screenLeft}, ${screenTop}) ` +
         `screen.availLeft|Top:(${screen.availLeft}, ${screen.availTop})`);
-    document.documentElement.requestFullscreen()
-      .then(() => { log('Fullscreen on load: success'); })
-      .catch(() => { log('Fullscreen on load: failure'); });
+    requestFullscreen('popup load in popup listener');
   }
 });
 
 function updatePermissionStatus(p) {
   permissionStatus = p;
-  log(`Permission status: ${permissionStatus.state}`);
+  log(`window-management permission: ${permissionStatus.state}`);
   document.getElementById('requestWindowManagementPermission')?.addEventListener('click', () => { window.getScreenDetails(); });
   document.getElementById('windowManagementStatusPrompt').style.display = permissionStatus.state === 'prompt' ? 'inline' : 'none';
   document.getElementById('windowManagementStatusGranted').style.display = permissionStatus.state === 'granted' ? 'inline' : 'none';
@@ -89,12 +89,23 @@ async function updateScreens(requestPermission = true) {
   return screens;
 }
 
+function requestFullscreen(eventName) {
+  document.documentElement.requestFullscreen()
+  .then(() => { log(`Entered fullscreen on ${eventName}`);})
+  .catch(e => {log(`Failed to fullscreen on ${eventName} '${e}'`);});
+}
+
 function getFeaturesFromOptions(options) {
   return 'popup' +
          (options.x ? ',left=' + options.x : '') +
          (options.y ? ',top=' + options.y : '') +
          (options.w ? ',width=' + options.w : '') +
          (options.h ? ',height=' + options.h : '');
+}
+
+function openPopups(options = {}) {
+  for (let s of screenDetails?.screens)
+    openPopup(Object.assign({}, options, {screen:s}));
 }
 
 function openPopup(options = {}) {
@@ -114,10 +125,13 @@ function openPopup(options = {}) {
     options.url.search = params.toString();
   }
   let popup = window.open(options.url, '_blank', features);
-  log(`Requested popup #${popups.length + 1} with features: '${features}' ` +
-      `fullscreen?: ${options.fullscreen || 'no'} result: ${popup}`);
   if (popup) {
     popup.number = popups.length + 1;
+    setTimeout(() => {
+      log(`Opened popup #${popup.number} with features '${features}'; ` +
+          `bounds: [${popup.screenX},${popup.screenY} ${popup.outerWidth}x${popup.outerHeight}]` +
+          (options.fullscreen ? `; fullscreen via ${options.fullscreen} ${popup.document.fullscreenElement ? 'succeeded' : 'failed'}` : ''));
+    }, 900);
     if (options.fullscreen === 'openerOnload') {
       popup.addEventListener('load', async () => {
         // Use a timeout so browser WebPrefs reach renderer Document Settings.
@@ -127,9 +141,10 @@ function openPopup(options = {}) {
               // `currentScreen: ${popup.screenDetails?.currentScreen.label} ` +
               `popup.screenLeft|Top:(${popup.screenLeft}, ${popup.screenTop}) ` +
               `screen.availLeft|Top:(${popup.screen.availLeft}, ${popup.screen.availTop})`);
+          let eventName = 'popup load in opener listener';
           popup.document.documentElement.requestFullscreen()
-            .then(() => { log('Fullscreen popup from opener: success'); })
-            .catch(() => { log('Fullscreen popup from opener: failure'); });
+            .then(() => { log(`Entered fullscreen on ${eventName}`);})
+            .catch(e => {log(`Failed to fullscreen on ${eventName} '${e}'`);});
         }, 100);
       });
     }
@@ -140,6 +155,8 @@ function openPopup(options = {}) {
         popup.observerInterval = null;
       }
     }, 300);
+  } else {
+    log(`Failed to open popup #${popup.length} with features '${features}'`);
   }
   popups.push(popup);
 }
