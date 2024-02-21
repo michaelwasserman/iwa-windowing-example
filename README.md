@@ -22,7 +22,7 @@ Note: Keep the new `ed25519key.pem` private key file secure; do not share it in 
 ## Run
 
 ```console
-$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode,FullscreenPopupWindows,WebAppBorderless
+$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode,AutomaticFullscreenContentSetting,FullscreenPopupWindows,WebAppBorderless
 ```
 
 chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> dist/signed.swbn
@@ -32,6 +32,16 @@ Note: If [reinstall fails with a manifest error](crbug.com/1494141), try restart
 chrome://apps -> "IWA Windowing Example"
 
 ## Windowing features, docs, and resources:
+
+### Automatic Fullscreen Content Setting
+
+Permits Element.requestFullscreen() calls without a user gesture (transient activation)
+
+* Requires chrome://flags/#automatic-fullscreen-content-setting or `--enable-features=AutomaticFullscreenContentSetting`
+* Users can allow individual IWAs in chrome://settings; enterprise admins can allow additional origins
+* Used in this example to open fullscreen popups, or enter fullscreen on mouse hover
+* [Explainer](https://github.com/explainers-by-googlers/html-fullscreen-without-a-gesture),
+  [ChromeStatus](https://chromestatus.com/feature/6218822004768768)
 
 ### Borderless Display Mode
 
@@ -61,15 +71,18 @@ Web Application Manifest display_override mode that lets app content be shown as
 
 Enhances window.open() to open popup windows in fullscreen mode
 
-* Requires [Window Management](https://w3c.github.io/window-management/) permission and permisison-policy
+* Requires [Window Management](https://w3c.github.io/window-management/) permission and permisison-policy, and per-popup user gesture (transient activation)
 * Requires chrome://flags/#fullscreen-popup-windows, `--enable-features=FullscreenPopupWindows`, or [Origin Trial registration](https://developer.chrome.com/origintrials/#/view_trial/106960491150049281)
+* Each popup only enters fullscreen with requisite permission and requires 
 * [Explainer](https://github.com/w3c/window-management/blob/main/EXPLAINER_fullscreen_popups.md),
   [chromeStatus](https://chromestatus.com/feature/6002307972464640),
   [web.dev OT article](https://developer.chrome.com/blog/fullscreen-popups-origin-trial/),
   [Window Management Demo](https://michaelwasserman.github.io/window-placement-demo/),
 
-### Popups And Redirects Content Setting
+### Pop-ups And Redirects Content Setting
 
-Permits window.open() calls without needing to consume a "gesture" (transient user activation)
+Permits window.open() calls without a user gesture (transient activation)
 
-### TODO: More...
+* Users or enterprise admins can allow by default or for individual origins in chrome://settings
+
+### TODO: [Additional Windowing Controls](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md), more...
