@@ -24,8 +24,6 @@ window.addEventListener('load', async () => {
   document.getElementById('exitFullscreenOnMouseEnterButton')?.addEventListener('mouseenter', () => { document.exitFullscreen(); });
   document.getElementById('openWindowButton')?.addEventListener('click', openPopup);
   document.getElementById('openMultipleButton')?.addEventListener('click', openPopups);
-  document.getElementById('openFullscreenFeatureButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'windowFeature'}));
-  document.getElementById('openMultipleFullscreenFeatureButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'windowFeature'}));
   document.getElementById('openFullscreenOpenerOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'openerOnload'}));
   document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'openerOnload'}));
   document.getElementById('openFullscreenPopupOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'popupOnload'}));
@@ -117,9 +115,7 @@ function openPopup(options = {}) {
   if (options.h === undefined) options.h = options.screen.availHeight !== undefined ? options.screen.availHeight : options.screen.height;
 
   let features = getFeaturesFromOptions(options);
-  if (options.fullscreen === 'windowFeature') {
-    features += ',fullscreen';
-  } else if (options.fullscreen === 'popupOnload') {
+  if (options.fullscreen === 'popupOnload') {
     let params = new URLSearchParams(options.url.search);
     params.set('fullscreen', '');
     options.url.search = params.toString();
