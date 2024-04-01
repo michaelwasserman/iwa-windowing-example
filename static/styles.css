@@ -25,7 +25,7 @@ h3 { margin-top:20px; margin-bottom:10px; }
   .displaymode-window-controls-overlay { display:inline; }
 }
 @media (display-mode:borderless) {
-    .displaymode-borderless { display:inline; }
+  .displaymode-borderless { display:inline; }
 }
 
 .htmlfullscreen-none { display:inline; }
@@ -35,12 +35,13 @@ h3 { margin-top:20px; margin-bottom:10px; }
   .htmlfullscreen-fullscreen { display:inline; }
 }
 
-.draggable { app-region:drag; -webkit-app-region:drag; border-style:solid; }
-.appregion-draggable { display:none; }
+.appregion-draggable { display:none; app-region:drag; -webkit-app-region:drag; border-style:solid; }
 .appregion-other { display:inline; }
 @media (display-mode:window-controls-overlay), (display-mode:borderless) {
   .appregion-draggable { display:inline; }
   .appregion-other { display:none; }
 }
+
+#activationState { display:inline; }
 
 .log { border-style:solid; }

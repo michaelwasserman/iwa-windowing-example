@@ -11,87 +11,103 @@ function log(text) {
 
 window.addEventListener('load', async () => {
   document.documentElement.style.background = `hsl(${Math.floor(Math.random() * 360)}deg 60% 90%)`;
-  if (!('getScreenDetails' in self) || !('isExtended' in screen) || !('onchange' in screen)) {
-    log('Window Management API not supported');
-  } else {
+  if ('getScreenDetails' in self) {
     permissionStatus = await navigator.permissions.query({name:'window-management'});
     permissionStatus.addEventListener('change', (e) => { updatePermissionStatus(e.target) });
     updatePermissionStatus(permissionStatus);
+  } else {
+    log('Window Management API not supported');
   }
-  document.getElementById('requestFullscreenButton')?.addEventListener('click', requestFullscreen.bind(null, 'click'));
+  logScreens();
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) log("Exited fullscreen"); });
+  document.getElementById('requestFullscreenButton')?.addEventListener('click', () => { requestFullscreen('on click')});
   document.getElementById('exitFullscreenButton')?.addEventListener('click', () => { document.exitFullscreen(); });
-  document.getElementById('requestFullscreenOnMouseEnterButton')?.addEventListener('mouseenter', requestFullscreen.bind(null, 'mouseenter'));
-  document.getElementById('exitFullscreenOnMouseEnterButton')?.addEventListener('mouseenter', () => { document.exitFullscreen(); });
   document.getElementById('openWindowButton')?.addEventListener('click', openPopup);
   document.getElementById('openMultipleButton')?.addEventListener('click', openPopups);
-  document.getElementById('openFullscreenOpenerOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'openerOnload'}));
-  document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'openerOnload'}));
+  document.getElementById('requestFullscreenOnMouseEnterButton')?.addEventListener('mouseenter', requestFullscreenOnHover);
+  document.getElementById('requestFullscreen6sAfterClickButton')?.addEventListener('click', requestFullscreenAfter6s);
+  document.getElementById('exitFullscreenOnMouseEnterButton')?.addEventListener('click', () => { document.exitFullscreen(); });
   document.getElementById('openFullscreenPopupOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'popupOnload'}));
   document.getElementById('openMultipleFullscreenPopupOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'popupOnload'}));
+  document.getElementById('openFullscreenOpenerOnloadButton')?.addEventListener('click', openPopup.bind(null, {fullscreen:'openerOnload'}));
+  document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'openerOnload'}));
   let params = new URLSearchParams(window.location.search);
   if (params.has('fullscreen')) {
-    log(`Requesting fullscreen on load; ` +
-        // `currentScreen: ${screenDetails?.currentScreen.label} ` +
-        `screenLeft|Top:(${screenLeft}, ${screenTop}) ` +
-        `screen.availLeft|Top:(${screen.availLeft}, ${screen.availTop})`);
-    requestFullscreen('popup load in popup listener');
+    // Use a timeout so browser WebPrefs reach renderer Document Settings.
+    setTimeout(() => { requestFullscreen('on load'); }, 100);
   }
+  setInterval(() => {
+    document.getElementById('activationState').innerText =
+      navigator.userActivation.isActive ? 'Active (lasts 5s)' :
+        navigator.userActivation.hasBeenActive ? 'Has been active (expired or consumed)' : 'Not active';
+    document.getElementById('requestFullscreenOnMouseEnterButton').disabled = navigator.userActivation.isActive;
+  }, 300);
 });
 
 function updatePermissionStatus(p) {
   permissionStatus = p;
-  log(`window-management permission: ${permissionStatus.state}`);
-  document.getElementById('requestWindowManagementPermission')?.addEventListener('click', () => { window.getScreenDetails(); });
+  log(`Window Management permission: ${permissionStatus.state}`);
+  document.getElementById('requestWindowManagementPermission')?.addEventListener('click', getScreens.bind(null, /*requestPermission=*/true));
   document.getElementById('windowManagementStatusPrompt').style.display = permissionStatus.state === 'prompt' ? 'inline' : 'none';
   document.getElementById('windowManagementStatusGranted').style.display = permissionStatus.state === 'granted' ? 'inline' : 'none';
   document.getElementById('windowManagementStatusDenied').style.display = permissionStatus.state === 'denied' ? 'inline' : 'none';
-  updateScreens(/*requestPermission=*/false);
+  document.getElementById('openMultipleButton').disabled = permissionStatus.state !== 'granted';
+  document.getElementById('openMultipleFullscreenPopupOnloadButton').disabled = permissionStatus.state !== 'granted';
+  document.getElementById('openMultipleFullscreenOpenerOnloadButton').disabled = permissionStatus.state !== 'granted';
 }
 
-function setScreenListeners() {
-  let screens = screenDetails ? screenDetails.screens : [ window.screen ];
-  for (const s of screens)
-    s.onchange = () => { updateScreens(/*requestPermission=*/false); };
+async function setScreenListeners() {
+  for (const s of await getScreens(/*requestPermission=*/false))
+    s.onchange = logScreens;
 }
 
-async function getScreenDetailsWithWarningAndFallback(requestPermission = false) {
-  if ('getScreenDetails' in self) {
-    if (!screenDetails && ((permissionStatus && permissionStatus.state === 'granted') ||
-                           (permissionStatus && permissionStatus.state === 'prompt' && requestPermission))) {
-      screenDetails = await getScreenDetails().catch(e =>{ console.error(e); return null; });
-      if (screenDetails) {
-        screenDetails.addEventListener('screenschange', () => { updateScreens(/*requestPermission=*/false); setScreenListeners(); });
-        setScreenListeners();
-      }
-    }
-
+function logScreens() {
+  getScreens(/*requestPermission=*/false).then(() => {
     if (screenDetails) {
-      // log('Detected ' + screenDetails.screens.length + ' screens:');
-      // for (let i = 0; i < screenDetails.screens.length; ++i) {
-      //   const s = screenDetails.screens[i];
-      //   log(`[${i}] '${s.label}' [${s.left},${s.top} ${s.width}x${s.height}] ` +
-      //       `(${s.availLeft},${s.availTop} ${s.availWidth}x${s.availHeight}) ` +
-      //       `devicePixelRatio:${s.devicePixelRatio} colorDepth:${s.colorDepth} ` +
-      //       `isExtended:${s.isExtended} isPrimary:${s.isPrimary} isInternal:${s.isInternal}`);
-      // }
-      return screenDetails.screens;
+      log('Detected ' + screenDetails.screens.length + ' screens:');
+      for (let i = 0; i < screenDetails.screens.length; ++i) {
+        const s = screenDetails.screens[i];
+        log(`[${i}] '${s.label}' (${s.left},${s.top} ${s.width}x${s.height}) ${s.devicePixelRatio}x ` +
+            `${s.isPrimary ? 'primary' : 'secondary'} ${s.isInternal? 'internal' : 'external'}`);
+      }
+    } else {
+      log(`Detected window.screen: (${screen.availLeft},${screen.availTop} ${screen.width}x${screen.height}) isExtended:${screen.isExtended}`);
+    }
+  });
+};
+
+async function getScreens(requestPermission = false) {
+  if ('getScreenDetails' in self && !screenDetails &&
+      (permissionStatus?.state === 'granted' || requestPermission)) {
+    if (screenDetails = await getScreenDetails().catch(e => log(e))) {
+      screenDetails.addEventListener('screenschange', () => { logScreens(); setScreenListeners(); });
+      setScreenListeners();
     }
   }
-  // log(`Detected window.screen: (${screen.left},${screen.top} ${screen.width}x${screen.height}) isExtended:${screen.isExtended}`);
-  return [ window.screen ];
+  return screenDetails?.screens ?? [ window.screen ];
 }
 
-async function updateScreens(requestPermission = true) {
-  const screens = await getScreenDetailsWithWarningAndFallback(requestPermission);
-  // TODO: Log or display screen info.
-  return screens;
+function requestFullscreen(eventName, element = document.documentElement) {
+  element.requestFullscreen()
+  .then(() => { log(`Entered fullscreen ${eventName}`);})
+  .catch(e => {log(`Failed to fullscreen ${eventName} '${e}'`);});
 }
 
-function requestFullscreen(eventName) {
-  document.documentElement.requestFullscreen()
-  .then(() => { log(`Entered fullscreen on ${eventName}`);})
-  .catch(e => {log(`Failed to fullscreen on ${eventName} '${e}'`);});
+function requestFullscreenOnHover() {
+  if (navigator.userActivation.isActive) {
+    log('Skipping fullscreen request on hover while document is active');
+    return;
+  }
+  requestFullscreen('on hover');
 }
+
+function requestFullscreenAfter6s() {
+  document.getElementById('requestFullscreen6sAfterClickButton').disabled = true;
+  setTimeout(() => {
+    requestFullscreen('6s after click');
+    document.getElementById('requestFullscreen6sAfterClickButton').disabled = false;
+  }, 6000);
+};
 
 function getFeaturesFromOptions(options) {
   return 'popup' +
@@ -102,7 +118,7 @@ function getFeaturesFromOptions(options) {
 }
 
 function openPopups(options = {}) {
-  for (let s of screenDetails?.screens)
+  for (let s of (screenDetails?.screens ?? [window.screen]))
     openPopup(Object.assign({}, options, {screen:s}));
 }
 
@@ -129,20 +145,10 @@ function openPopup(options = {}) {
           (options.fullscreen ? `; fullscreen via ${options.fullscreen} ${popup.document.fullscreenElement ? 'succeeded' : 'failed'}` : ''));
     }, 900);
     if (options.fullscreen === 'openerOnload') {
-      popup.addEventListener('load', async () => {
-        // Use a timeout so browser WebPrefs reach renderer Document Settings.
-        // Why does this event fire before the window's own load event?
-        setTimeout(async () => {
-          log(`Requesting to fullscreen popup from opener; ` +
-              // `currentScreen: ${popup.screenDetails?.currentScreen.label} ` +
-              `popup.screenLeft|Top:(${popup.screenLeft}, ${popup.screenTop}) ` +
-              `screen.availLeft|Top:(${popup.screen.availLeft}, ${popup.screen.availTop})`);
-          let eventName = 'popup load in opener listener';
-          popup.document.documentElement.requestFullscreen()
-            .then(() => { log(`Entered fullscreen on ${eventName}`);})
-            .catch(e => {log(`Failed to fullscreen on ${eventName} '${e}'`);});
-        }, 100);
-      });
+      // Use a timeout so browser WebPrefs reach renderer Document Settings.
+      popup.addEventListener('load', () => { setTimeout(() => {
+        requestFullscreen('on popup load from opener', popup.document.documentElement);
+      }, 100); });
     }
     popup.observerInterval = setInterval(() => {
       if (popup.closed) {
@@ -152,7 +158,7 @@ function openPopup(options = {}) {
       }
     }, 300);
   } else {
-    log(`Failed to open popup #${popup.length} with features '${features}'`);
+    log(`Failed to open popup #${popups.length + 1} with features '${features}'`);
   }
   popups.push(popup);
 }

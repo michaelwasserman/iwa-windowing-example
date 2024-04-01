@@ -12,43 +12,47 @@
 </head>
 <body>
   <h3>IWA Windowing Example (<a href="https://github.com/michaelwasserman/iwa-windowing-example/">GitHub</a>)</h3>
-  <div><strong>display-mode:</strong>
+  <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/display-mode">Display Mode</a>:</strong>
     <div class="displaymode-fullscreen">fullscreen</div>
     <div class="displaymode-standalone">standalone</div>
     <div class="displaymode-minimal-ui">minimal-ui</div>
     <div class="displaymode-browser">browser</div>
     <div class="displaymode-window-controls-overlay">window-controls-overlay</div>
     <div class="displaymode-borderless">borderless</div>
-   </div>
-  <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window_Management_API">window-management</a> permission:</strong>
+  </div>
+  <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window_Management_API">Window Management</a>:</strong>
     <div id="windowManagementStatusPrompt"><button id="requestWindowManagementPermission">prompt</button></div>
     <div id="windowManagementStatusGranted">granted</div>
-    <div id="windowManagementStatusDenied" class="warning">denied (reset and reload for full demo functionality)</div>
+    <div id="windowManagementStatusDenied" class="warning">denied (functionality limited)</div>
   </div>
-  <div><strong>HTML Fullscreen:</strong>
-    <div class="htmlfullscreen-none">(not fullscreen) <button id="requestFullscreenButton">request on click</button></div>
-    <div class="htmlfullscreen-fullscreen">(fullscreen) <button id="exitFullscreenButton">exit</button></div>
+  <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">Fullscreen</a>:</strong>
+    <button id="requestFullscreenButton" class="htmlfullscreen-none">request</button>
+    <button id="exitFullscreenButton" class="htmlfullscreen-fullscreen">exit</button>
   </div>
-  <div><strong>window.open:</strong>
-    <button id="openWindowButton">open window</button>
-    <button id="openMultipleButton">open multiple</button>
+  <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/open#popup">Popups</a>:</strong>
+    <button id="openWindowButton">open</button>
+    <button id="openMultipleButton">one per screen</button>
   </div>
-  <div><strong class="draggable">app-region: drag</strong>
-    <div class="appregion-draggable">(draggable)</div>
-    <div class="appregion-other">(not-draggable - requires display-mode: window-controls-overlay or borderless)</div>
+  <div><strong><a href="https://web.dev/articles/window-controls-overlay#determining_which_parts_of_the_title_bar_are_draggable">App Region</a>:</strong>
+    <div class="appregion-draggable">click and drag the window from here!</div>
+    <div class="appregion-other">not draggable</div>
   </div>
-  <div><h3>Experimental</h3>
-    <div><strong>Automatic HTML Fullscreen:</strong>
-      <div class="htmlfullscreen-none">(not fullscreen) <button id="requestFullscreenOnMouseEnterButton">request on mouseenter</button></div>
-      <div class="htmlfullscreen-fullscreen">(fullscreen) <button id="exitFullscreenOnMouseEnterButton">exit</button></div>
+  <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userActivation">User Activation</a>:</strong>
+    <div id="activationState">Not active</div>
+  </div>
+  <div><h3>Experimental <a href="https://chromestatus.com/feature/6218822004768768">Automatic Fullscreen</a> Features</h3>
+    <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">Fullscreen</a>:</strong>
+      <button id="requestFullscreenOnMouseEnterButton" class="htmlfullscreen-none">request on hover</button>
+      <button id="requestFullscreen6sAfterClickButton" class="htmlfullscreen-none">request after 6s</button>
+      <button id="exitFullscreenOnMouseEnterButton" class="htmlfullscreen-fullscreen">exit</button>
     </div>
-    <div><strong>window.open</strong> (opener requests fullscreen on popup load):
-      <button id="openFullscreenOpenerOnloadButton">open</button>
-      <button id="openMultipleFullscreenOpenerOnloadButton">open multiple</button>
-    </div>
-    <div><strong>window.open</strong> (popup requests fullscreen on load itself):
+    <div><strong>Fullscreen Popups:</strong> (popup requests):
       <button id="openFullscreenPopupOnloadButton">open</button>
-      <button id="openMultipleFullscreenPopupOnloadButton">open multiple</button>
+      <button id="openMultipleFullscreenPopupOnloadButton">one per screen</button>
+    </div>
+    <div><strong>Fullscreen Popups:</strong> (opener requests):
+      <button id="openFullscreenOpenerOnloadButton">open</button>
+      <button id="openMultipleFullscreenOpenerOnloadButton">one per screen</button>
     </div>
   </div>
   <div><h3>Log</h3>
