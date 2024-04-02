@@ -33,8 +33,8 @@ window.addEventListener('load', async () => {
   document.getElementById('openMultipleFullscreenOpenerOnloadButton')?.addEventListener('click', openPopups.bind(null, {fullscreen:'openerOnload'}));
   let params = new URLSearchParams(window.location.search);
   if (params.has('fullscreen')) {
-    // Use a timeout so browser WebPrefs reach renderer Document Settings.
-    setTimeout(() => { requestFullscreen('on load'); }, 100);
+    // Use a timeout so browser WebPrefs reach renderer Document Settings :-/
+    setTimeout(() => { requestFullscreen('on load'); }, 200);
   }
   setInterval(() => {
     document.getElementById('activationState').innerText =
@@ -57,12 +57,12 @@ function updatePermissionStatus(p) {
 }
 
 async function setScreenListeners() {
-  for (const s of await getScreens(/*requestPermission=*/false))
+  for (const s of await getScreens())
     s.onchange = logScreens;
 }
 
 function logScreens() {
-  getScreens(/*requestPermission=*/false).then(() => {
+  getScreens().then(() => {
     if (screenDetails) {
       log('Detected ' + screenDetails.screens.length + ' screens:');
       for (let i = 0; i < screenDetails.screens.length; ++i) {
@@ -141,14 +141,14 @@ function openPopup(options = {}) {
     popup.number = popups.length + 1;
     setTimeout(() => {
       log(`Opened popup #${popup.number} with features '${features}'; ` +
-          `bounds: [${popup.screenX},${popup.screenY} ${popup.outerWidth}x${popup.outerHeight}]` +
+          `bounds: (${popup.screenX},${popup.screenY} ${popup.outerWidth}x${popup.outerHeight})` +
           (options.fullscreen ? `; fullscreen via ${options.fullscreen} ${popup.document.fullscreenElement ? 'succeeded' : 'failed'}` : ''));
     }, 900);
     if (options.fullscreen === 'openerOnload') {
-      // Use a timeout so browser WebPrefs reach renderer Document Settings.
+      // Use a timeout so browser WebPrefs reach renderer Document Settings :-/
       popup.addEventListener('load', () => { setTimeout(() => {
         requestFullscreen('on popup load from opener', popup.document.documentElement);
-      }, 100); });
+      }, 300); });
     }
     popup.observerInterval = setInterval(() => {
       if (popup.closed) {
@@ -156,7 +156,7 @@ function openPopup(options = {}) {
         clearInterval(popup.observerInterval);
         popup.observerInterval = null;
       }
-    }, 300);
+    }, 200);
   } else {
     log(`Failed to open popup #${popups.length + 1} with features '${features}'`);
   }
