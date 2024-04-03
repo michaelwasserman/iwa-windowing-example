@@ -1,6 +1,8 @@
 div { margin-bottom:6px; }
 h3 { margin-top:20px; margin-bottom:10px; }
 
+.header { width:100%; app-region:drag; -webkit-app-region:drag; }
+
 .displaymode-fullscreen { display:none; }
 .displaymode-standalone { display:none; }
 .displaymode-minimal-ui { display:none; }

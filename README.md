@@ -1,10 +1,43 @@
 # IWA Windowing Example
 
-An example of windowing in an [Isolated Web Application (IWA)](https://github.com/WICG/isolated-web-apps), leveraging the barebones [IWA Bundling Example](https://github.com/michaelwasserman/iwa-bundling-example).
+An example of [Isolated Web Application (IWA)](https://github.com/WICG/isolated-web-apps) windowing functionality
 
-Run or install this example as a **non-IWA** web application at https://michaelwasserman.github.io/iwa-windowing-example/static
+## How to Run
 
-## Prep and Bundle
+Build or <a href="https://raw.githubusercontent.com/michaelwasserman/iwa-windowing-example/main/iwa-windowing-example.swbn">download</a> the signed web bundle.
+
+Run Chrome M124+ and enable flags:
+* chrome://flags/#enable-isolated-web-apps
+* chrome://flags/#enable-isolated-web-app-dev-mode
+* chrome://flags/#automatic-fullscreen-content-setting
+* chrome://flags/#enable-desktop-pwas-borderless
+
+```console
+$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode,AutomaticFullscreenContentSetting,WebAppBorderless
+```
+
+Visit chrome://web-app-internals/ and point "Install IWA from Signed Web Bundle" to iwa-windowing-example.swbn
+
+Visit chrome://apps and launch "IWA Windowing Example"
+
+Note: If [reinstall fails](https://issues.chromium.org/issues/40286084), try restarting Chrome.
+
+## Optional: Test limited non-IWA functionality
+
+This example is hosted by GitHub [HERE](https://michaelwasserman.github.io/iwa-windowing-example/static).
+Functionality is limited without IWA installation.
+
+## Optional: Self-Host a Dev Mode Proxy
+
+```console
+$ git clone https://github.com/michaelwasserman/iwa-windowing-example.git
+$ cd iwa-windowing-example/static
+$ python3 -m http.server [port]
+```
+
+Visit chrome://web-app-internals/ and point "Install IWA via Dev Mode Proxy" to http://localhost:[port]/
+
+## Optional: Self-Build a Signed Web Bundle
 
 ```console
 $ git clone https://github.com/michaelwasserman/iwa-windowing-example.git
@@ -15,37 +48,27 @@ $ npm init
 $ npm run build
 ```
 
-This creates `iwa-windowing-example.swbn`.
+This builds `iwa-windowing-example.swbn` to use with chrome://web-app-internals/.
 
 Note: Keep the new `ed25519key.pem` private key file secure; do not share it in a public repo :)
-
-## Run
-
-```console
-$ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode,AutomaticFullscreenContentSetting,FullscreenPopupWindows,WebAppBorderless
-```
-
-chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> iwa-windowing-example.swbn
-
-Note: If [reinstall fails with a manifest error](crbug.com/1494141), try restarting Chrome.
-
-chrome://apps -> "IWA Windowing Example"
+Note: See barebones [IWA Bundling Example](https://github.com/michaelwasserman/iwa-bundling-example).
 
 ## Windowing features, docs, and resources:
 
-### Automatic Fullscreen Content Setting
+### Automatic Fullscreen Content Setting (IWA or enterprise only)
 
-Permits Element.requestFullscreen() calls without a user gesture (transient activation)
+Permits Element.requestFullscreen() calls without a user gesture (transient activation).
+Used to open fullscreen popups, and enter fullscreen on mouse hover or after a 6s delay.
 
 * Requires chrome://flags/#automatic-fullscreen-content-setting or `--enable-features=AutomaticFullscreenContentSetting`
 * Users can allow individual IWAs in chrome://settings; enterprise admins can allow additional origins
-* Used in this example to open fullscreen popups, or enter fullscreen on mouse hover
 * [Explainer](https://github.com/explainers-by-googlers/html-fullscreen-without-a-gesture),
   [ChromeStatus](https://chromestatus.com/feature/6218822004768768)
 
-### Borderless Display Mode
+### Borderless Display Mode (IWA-only)
 
-Web Application Manifest display_override mode that lets app content be shown without any browser-provided window frame.
+A Web Application Manifest display_override mode.
+Used to show app content without any browser-provided window frame.
 
 * Requires Isolated Web App context
 * Requires [Window Management](https://w3c.github.io/window-management/) permission and permisison-policy
@@ -55,7 +78,13 @@ Web Application Manifest display_override mode that lets app content be shown wi
   [ChromeStatus](https://chromestatus.com/feature/5551475195904000),
   [Borderless mode demo app](https://github.com/sonkkeli/borderless)
 
-### Window-Controls-Overlay (WCO) Display Mode
+### TODO: [Additional Windowing Controls](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md) (IWA-only)
+
+### Fullscreen (with a user gesture)
+
+### Window Management API (cross-screen popups and fullscreen)
+
+### Window-Controls-Overlay (WCO) Display Mode (Installed Web Apps only)
 
 Web Application Manifest display_override mode that lets app content be shown as part of the browser-provided window titlebar.
 
@@ -67,22 +96,11 @@ Web Application Manifest display_override mode that lets app content be shown as
   [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/API/Window_Controls_Overlay_API),
   [WCO Example PWA](https://amandabaker.github.io/pwa/explainer-example/index.html)
 
-### Fullscreen popups
-
-Enhances window.open() to open popup windows in fullscreen mode
-
-* Requires [Window Management](https://w3c.github.io/window-management/) permission and permisison-policy, and per-popup user gesture (transient activation)
-* Requires chrome://flags/#fullscreen-popup-windows, `--enable-features=FullscreenPopupWindows`, or [Origin Trial registration](https://developer.chrome.com/origintrials/#/view_trial/106960491150049281)
-* Each popup only enters fullscreen with requisite permission and requires 
-* [Explainer](https://github.com/w3c/window-management/blob/main/EXPLAINER_fullscreen_popups.md),
-  [chromeStatus](https://chromestatus.com/feature/6002307972464640),
-  [web.dev OT article](https://developer.chrome.com/blog/fullscreen-popups-origin-trial/),
-  [Window Management Demo](https://michaelwasserman.github.io/window-placement-demo/),
-
 ### Pop-ups And Redirects Content Setting
 
 Permits window.open() calls without a user gesture (transient activation)
+Used to open a popup on each display of multi-screen device with one gesture.
 
 * Users or enterprise admins can allow by default or for individual origins in chrome://settings
 
-### TODO: [Additional Windowing Controls](https://github.com/ivansandrk/additional-windowing-controls/blob/main/awc-explainer.md), more...
+### DEPRECATED: [Fullscreen popups](https://chromestatus.com/feature/6002307972464640).
