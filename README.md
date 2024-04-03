@@ -15,7 +15,7 @@ $ npm init
 $ npm run build
 ```
 
-This creates `dist/signed.swbn`.
+This creates `iwa-windowing-example.swbn`.
 
 Note: Keep the new `ed25519key.pem` private key file secure; do not share it in a public repo :)
 
@@ -25,7 +25,7 @@ Note: Keep the new `ed25519key.pem` private key file secure; do not share it in 
 $ chrome --enable-features=IsolatedWebApps,IsolatedWebAppDevMode,AutomaticFullscreenContentSetting,FullscreenPopupWindows,WebAppBorderless
 ```
 
-chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> dist/signed.swbn
+chrome://web-app-internals/ -> "Install IWA from Signed Web Bundle" -> iwa-windowing-example.swbn
 
 Note: If [reinstall fails with a manifest error](crbug.com/1494141), try restarting Chrome.
 
