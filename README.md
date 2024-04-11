@@ -24,7 +24,7 @@ Note: If [reinstall fails](https://issues.chromium.org/issues/40286084), try res
 
 ## Optional: Test limited non-IWA functionality
 
-This example is hosted by GitHub [HERE](https://michaelwasserman.github.io/iwa-windowing-example/static).
+This example is hosted on GitHub [HERE](https://michaelwasserman.github.io/iwa-windowing-example/static).
 Functionality is limited without IWA installation.
 
 ## Optional: Self-Host a Dev Mode Proxy
