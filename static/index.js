@@ -1,6 +1,7 @@
 'use strict';
 
-let permissionStatus = null;
+let windowManagmentPermissionStatus = null;
+let fullscreenWithoutGesturePermissionStatus = null;
 let screenDetails = null;
 let popups = [];
 
@@ -11,12 +12,16 @@ function log(text) {
 
 window.addEventListener('load', async () => {
   document.documentElement.style.background = `hsl(${Math.floor(Math.random() * 360)}deg 60% 90%)`;
-  if ('getScreenDetails' in self) {
-    permissionStatus = await navigator.permissions.query({name:'window-management'});
-    permissionStatus.addEventListener('change', (e) => { updatePermissionStatus(e.target) });
-    updatePermissionStatus(permissionStatus);
+  // if ('getScreenDetails' in self) { 
+  if (updateWindowManagementPermissionStatus(await navigator.permissions.query({name:'window-management'}).catch(e => null))) {
+    windowManagmentPermissionStatus.addEventListener('change', (e) => { updateWindowManagementPermissionStatus(e.target) });
   } else {
     log('Window Management API not supported');
+  }
+  if (updateFullscreenWithoutGesturePermissionStatus(await navigator.permissions.query({name:'fullscreen', allowWithoutGesture:true}).catch(e => null))) {
+    fullscreenWithoutGesturePermissionStatus.addEventListener('change', (e) => { updateFullscreenWithoutGesturePermissionStatus(e.target) });
+  } else {
+    log('Fullscreen Without Gesture not supported');
   }
   logScreens();
   document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) log("Exited fullscreen"); });
@@ -44,16 +49,25 @@ window.addEventListener('load', async () => {
   }, 300);
 });
 
-function updatePermissionStatus(p) {
-  permissionStatus = p;
-  log(`Window Management permission: ${permissionStatus.state}`);
+function updateWindowManagementPermissionStatus(p) {
+  windowManagmentPermissionStatus = p;
+  log(`Window Management permission: ${p?.state || "not supported"}`);
   document.getElementById('requestWindowManagementPermission')?.addEventListener('click', getScreens.bind(null, /*requestPermission=*/true));
-  document.getElementById('windowManagementStatusPrompt').style.display = permissionStatus.state === 'prompt' ? 'inline' : 'none';
-  document.getElementById('windowManagementStatusGranted').style.display = permissionStatus.state === 'granted' ? 'inline' : 'none';
-  document.getElementById('windowManagementStatusDenied').style.display = permissionStatus.state === 'denied' ? 'inline' : 'none';
-  document.getElementById('openMultipleButton').disabled = permissionStatus.state !== 'granted';
-  document.getElementById('openMultipleFullscreenPopupOnloadButton').disabled = permissionStatus.state !== 'granted';
-  document.getElementById('openMultipleFullscreenOpenerOnloadButton').disabled = permissionStatus.state !== 'granted';
+  document.getElementById('windowManagementStatusPrompt').style.display = p?.state === 'prompt' ? 'inline' : 'none';
+  document.getElementById('windowManagementStatusGranted').style.display = p?.state === 'granted' ? 'inline' : 'none';
+  document.getElementById('windowManagementStatusDenied').style.display = p?.state === 'denied' ? 'inline' : 'none';
+  document.getElementById('openMultipleButton').disabled = p?.state !== 'granted';
+  document.getElementById('openMultipleFullscreenPopupOnloadButton').disabled = p?.state !== 'granted';
+  document.getElementById('openMultipleFullscreenOpenerOnloadButton').disabled = p?.state !== 'granted';
+  return windowManagmentPermissionStatus;
+}
+
+function updateFullscreenWithoutGesturePermissionStatus(p) {
+  fullscreenWithoutGesturePermissionStatus = p;
+  log(`Fullscreen Without Gesture permission: ${p?.state || "not supported"}`);
+  document.getElementById('fullscreenWithoutGestureGranted').style.display = p?.state === 'granted' ? 'inline' : 'none';
+  document.getElementById('fullscreenWithoutGestureDenied').style.display = p?.state === 'denied' ? 'inline' : 'none';
+  return fullscreenWithoutGesturePermissionStatus;
 }
 
 async function setScreenListeners() {
@@ -78,7 +92,7 @@ function logScreens() {
 
 async function getScreens(requestPermission = false) {
   if ('getScreenDetails' in self && !screenDetails &&
-      (permissionStatus?.state === 'granted' || requestPermission)) {
+      (windowManagmentPermissionStatus?.state === 'granted' || requestPermission)) {
     if (screenDetails = await getScreenDetails().catch(e => log(e))) {
       screenDetails.addEventListener('screenschange', () => { logScreens(); setScreenListeners(); });
       setScreenListeners();
