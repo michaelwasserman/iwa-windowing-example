@@ -12,18 +12,14 @@ function log(text) {
 
 window.addEventListener('load', async () => {
   document.documentElement.style.background = `hsl(${Math.floor(Math.random() * 360)}deg 60% 90%)`;
-  // if ('getScreenDetails' in self) { 
   if (updateWindowManagementPermissionStatus(await navigator.permissions.query({name:'window-management'}).catch(e => null))) {
     windowManagmentPermissionStatus.addEventListener('change', (e) => { updateWindowManagementPermissionStatus(e.target) });
-  } else {
-    log('Window Management API not supported');
   }
   if (updateFullscreenWithoutGesturePermissionStatus(await navigator.permissions.query({name:'fullscreen', allowWithoutGesture:true}).catch(e => null))) {
     fullscreenWithoutGesturePermissionStatus.addEventListener('change', (e) => { updateFullscreenWithoutGesturePermissionStatus(e.target) });
-  } else {
-    log('Fullscreen Without Gesture not supported');
   }
   logScreens();
+  document.getElementById('windowManagementPrompt')?.addEventListener('click', getScreens.bind(null, /*requestPermission=*/true));
   document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) log("Exited fullscreen"); });
   document.getElementById('requestFullscreenButton')?.addEventListener('click', () => { requestFullscreen('on click')});
   document.getElementById('exitFullscreenButton')?.addEventListener('click', () => { document.exitFullscreen(); });
@@ -51,11 +47,10 @@ window.addEventListener('load', async () => {
 
 function updateWindowManagementPermissionStatus(p) {
   windowManagmentPermissionStatus = p;
-  log(`Window Management permission: ${p?.state || "not supported"}`);
-  document.getElementById('requestWindowManagementPermission')?.addEventListener('click', getScreens.bind(null, /*requestPermission=*/true));
-  document.getElementById('windowManagementStatusPrompt').style.display = p?.state === 'prompt' ? 'inline' : 'none';
-  document.getElementById('windowManagementStatusGranted').style.display = p?.state === 'granted' ? 'inline' : 'none';
-  document.getElementById('windowManagementStatusDenied').style.display = p?.state === 'denied' ? 'inline' : 'none';
+  log(`Window Management permission: ${p?.state || 'not supported'}`);
+  document.getElementById('windowManagementStatus').innerText = p?.state || 'not supported';
+  document.getElementById('windowManagementStatus').style.display = p?.state === 'prompt' ? 'none' : 'inline';
+  document.getElementById('windowManagementPrompt').style.display = p?.state === 'prompt' ? 'inline' : 'none';
   document.getElementById('openMultipleButton').disabled = p?.state !== 'granted';
   document.getElementById('openMultipleFullscreenPopupOnloadButton').disabled = p?.state !== 'granted';
   document.getElementById('openMultipleFullscreenOpenerOnloadButton').disabled = p?.state !== 'granted';
@@ -64,9 +59,8 @@ function updateWindowManagementPermissionStatus(p) {
 
 function updateFullscreenWithoutGesturePermissionStatus(p) {
   fullscreenWithoutGesturePermissionStatus = p;
-  log(`Fullscreen Without Gesture permission: ${p?.state || "not supported"}`);
-  document.getElementById('fullscreenWithoutGestureGranted').style.display = p?.state === 'granted' ? 'inline' : 'none';
-  document.getElementById('fullscreenWithoutGestureDenied').style.display = p?.state === 'denied' ? 'inline' : 'none';
+  log(`Fullscreen Without Gesture permission: ${p?.state || 'not supported'}`);
+  document.getElementById('fullscreenWithoutGestureStatus').innerText = p?.state || 'not supported';
   return fullscreenWithoutGesturePermissionStatus;
 }
 

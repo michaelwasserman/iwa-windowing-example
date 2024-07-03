@@ -30,6 +30,8 @@ h3 { margin-top:20px; margin-bottom:10px; }
   .displaymode-borderless { display:inline; }
 }
 
+.permissionstatus { display:inline; }
+
 .htmlfullscreen-none { display:inline; }
 .htmlfullscreen-fullscreen { display:none; }
 :fullscreen {

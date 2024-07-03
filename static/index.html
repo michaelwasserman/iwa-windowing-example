@@ -21,9 +21,8 @@
     <div class="displaymode-borderless">borderless</div>
   </div>
   <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window_Management_API">Window Management</a>:</strong>
-    <div id="windowManagementStatusPrompt"><button id="requestWindowManagementPermission">prompt</button></div>
-    <div id="windowManagementStatusGranted">granted</div>
-    <div id="windowManagementStatusDenied" class="warning">denied (functionality limited)</div>
+    <div id="windowManagementStatus" class="permissionstatus"></div>
+    <button id="windowManagementPrompt">prompt</button>
   </div>
   <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">Fullscreen</a>:</strong>
     <button id="requestFullscreenButton" class="htmlfullscreen-none">request</button>
@@ -42,8 +41,7 @@
   </div>
   <div><h3>Experimental <a href="https://chromestatus.com/feature/6218822004768768">Automatic Fullscreen</a> Features</h3>
     <div><strong><a href="https://github.com/explainers-by-googlers/html-fullscreen-without-a-gesture">Fullscreen Without Gesture</a>:</strong>
-      <div id="fullscreenWithoutGestureGranted">granted</div>
-      <div id="fullscreenWithoutGestureDenied" class="warning">denied (functionality limited)</div>
+      <div id="fullscreenWithoutGestureStatus" class="permissionstatus"></div>
     </div>
       <div><strong><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API">Fullscreen</a>:</strong>
       <button id="requestFullscreenOnMouseEnterButton" class="htmlfullscreen-none">request on hover</button>
