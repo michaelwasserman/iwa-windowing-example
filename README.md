@@ -62,7 +62,7 @@ Used to open fullscreen popups, and enter fullscreen on mouse hover or after a 6
 
 * Requires Chrome M127 (or chrome://flags/#automatic-fullscreen-content-setting on M124-126)
 * Permission detection requires Chrome M128 (or chrome://flags/#automatic-fullscreen-permissions-query on early M128 builds)
-* Users must grant permission to individual IWAs in chrome://settings; or enterprise admins myst allow origins by policy:
+* **Users must grant permission to the IWA in chrome://settings; or enterprise admins must allow the origin by policy:**
   * Set "Automatic full screen" to Allow from: IWA -> three-dot menu -> App Info -> Settings -> More Settings and Permissions
   * e.g. chrome://settings/content/siteDetails?site=isolated-app%3A%2F%2Fegggr2nt2of2snscqzoiitustiopkcfm4f6ep4bj5io3xlgm3itqaaac
   * Or allowing the origin via [AutomaticFullscreenAllowedForUrls](https://chromeenterprise.google/policies/?policy=AutomaticFullscreenAllowedForUrls) enterprise policy (see [quick start guides](https://www.chromium.org/administrators/))
