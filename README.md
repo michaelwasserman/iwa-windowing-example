@@ -43,8 +43,7 @@ Visit chrome://web-app-internals/ and point "Install IWA via Dev Mode Proxy" to 
 $ git clone https://github.com/michaelwasserman/iwa-windowing-example.git
 $ cd iwa-windowing-example
 $ openssl genpkey -algorithm Ed25519 -out ed25519key.pem
-$ npm i
-$ npm init
+$ npm install
 $ npm run build
 ```
 
